@@ -6,6 +6,7 @@ verify_ssl = true
 [dev-packages]
 ipython = "*"
 jupyterlab = "*"
+scikit-build = "*"
 numpy = "*"
 matplotlib = "*"
 keras = "*"
