@@ -7,3 +7,8 @@ _build
 dist
 __pycache__
 versioneer.pyc
+.env
+.h5
+
+#folders
+paper_files/

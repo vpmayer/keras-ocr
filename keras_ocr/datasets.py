@@ -154,6 +154,49 @@ def get_born_digital_recognizer_dataset(split='train', cache_dir=None):
             _read_born_digital_labels_file(labels_filepath=test_gt_path, image_folder=test_dir))
     return data
 
+def get_my_own_data(split='train', cache_dir=None, path='./'):
+    data = []
+    if cache_dir is None:
+        cache_dir = tools.get_default_cache_dir()
+    main_dir = os.path.join(cache_dir, 'MyData')
+    assert split in ['train', 'traintest', 'test'], f'Unsupported split: {split}'
+    if split in ['train', 'traintest']:
+        train_dir = os.path.join(main_dir, 'train')
+        training_zip_path = tools.download_and_verify(
+            url=
+            'https://github.com/faustomorales/keras-ocr/releases/download/v0.8.4/Challenge1_Training_Task3_Images_GT.zip',  # pylint: disable=line-too-long
+            filename='Challenge1_Training_Task3_Images_GT.zip',
+            cache_dir=main_dir,
+            sha256='8ede0639f5a8031d584afd98cee893d1c5275d7f17863afc2cba24b13c932b07')
+        if len(
+                glob.glob(os.path.join(train_dir, '*.png')) +
+                glob.glob(os.path.join(train_dir, '*.txt'))) != 3568:
+            with zipfile.ZipFile(training_zip_path) as zfile:
+                zfile.extractall(train_dir)
+        data.extend(
+            _read_born_digital_labels_file(labels_filepath=os.path.join(train_dir, 'gt.txt'),
+                                           image_folder=train_dir))
+    if split in ['test', 'traintest']:
+        test_dir = os.path.join(main_dir, 'test')
+        test_zip_path = tools.download_and_verify(
+            url=
+            'https://github.com/faustomorales/keras-ocr/releases/download/v0.8.4/Challenge1_Test_Task3_Images.zip',
+            filename='Challenge1_Test_Task3_Images.zip',
+            cache_dir=main_dir,
+            sha256='8f781b0140fd0bac3750530f0924bce5db3341fd314a2fcbe9e0b6ca409a77f0')
+        if len(glob.glob(os.path.join(test_dir, '*.png'))) != 1439:
+            with zipfile.ZipFile(test_zip_path) as zfile:
+                zfile.extractall(test_dir)
+        test_gt_path = tools.download_and_verify(
+            url=
+            'https://github.com/faustomorales/keras-ocr/releases/download/v0.8.4/Challenge1_Test_Task3_GT.txt',
+            cache_dir=test_dir,
+            filename='Challenge1_Test_Task3_GT.txt',
+            sha256='fce7f1228b7c4c26a59f13f562085148acf063d6690ce51afc395e0a1aabf8be')
+        data.extend(
+            _read_born_digital_labels_file(labels_filepath=test_gt_path, image_folder=test_dir))
+    return data
+
 
 def get_icdar_2013_recognizer_dataset(cache_dir=None):
     """Get a list of (filepath, box, word) tuples from the
